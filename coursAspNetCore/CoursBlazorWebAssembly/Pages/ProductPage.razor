@@ -1,0 +1,29 @@
+﻿@using CoursBlazorWebAssembly.Models
+@using CoursBlazorWebAssembly.Services
+
+@page "/product/{Name}"
+
+@inject ProductService _productService
+<h3>@Name</h3>
+<div>
+    Prix : @Price €
+</div>
+<div>
+    Description: @Description
+</div>
+
+@code {
+    [Parameter]
+    public string? Name { get; set; }
+    public string Description { get; set; }
+    public decimal Price { get; set; }
+
+    protected override void OnInitialized()
+    {
+        Product product = _productService.Products.FirstOrDefault(p => p.Name == Name);
+        if(product != null) {
+            Description = product.Description;
+            Price = product.Price;
+        }
+    }
+}

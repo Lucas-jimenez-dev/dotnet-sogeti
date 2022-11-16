@@ -1,0 +1,68 @@
+﻿@using CorrectionAnnuaireBlazor.Models
+@using CorrectionAnnuaireBlazor.Services
+@inject ContactService _contactService; 
+@inject NavigationManager _navigationManager;
+@page "/form"
+<h3>Formulaire Contact</h3>
+<EditForm Model="this" OnSubmit="@AddContact">
+    <div>
+        <InputText @bind-Value="Contact.FirstName" placeholder="Prénom du contact" />
+    </div>
+    <div>
+        <InputText @bind-Value="Contact.LastName" placeholder="Nom du contact" />
+    </div>
+    <div>
+        <InputText @bind-Value="Contact.Phone" placeholder="Téléphone du contact" />
+    </div>
+    <a @onclick="AddNbEmails">Ajouter un email</a>
+    @for(int i=0; i < NbEmails; i++) {
+        <div>
+            @*<InputText @bind-Value="Mails[0]" />*@
+            @{
+                var placeholder = "Mail N° " + i;
+                var val = Mails[i];
+                var index = i;
+            }
+            <input value="@val" placeholder="@placeholder" @oninput="(e) =>SetValueMail(e.Value.ToString(), index)" />
+        </div>
+    }
+    <div>
+        <button type="submit">Valider</button>
+    </div>
+</EditForm>
+@code {
+    public Contact Contact { get; set; }
+
+    public int NbEmails { get; set; }
+
+    public List<string> Mails { get; set; }
+
+    protected override void OnInitialized()
+    {
+        Contact = new();
+        Mails = new();
+        NbEmails = 1;
+        Mails.Add(null);
+    }
+
+    public void AddContact() {
+
+        for(int i=0; i < Mails.Count; i++) {
+            Contact.Emails.Add(new Email() { Id = i + 1, Mail = Mails[i] });
+        }
+
+        if(_contactService.AddContact(Contact)) {
+            _navigationManager.NavigateTo("/");
+        }
+    }
+
+    public void SetValueMail(string val, int index) {
+        Mails[index] = val;
+    }
+
+    public void AddNbEmails() {
+        NbEmails++;
+        Mails.Add(null);
+    }
+
+}
